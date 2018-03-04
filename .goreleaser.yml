@@ -1,0 +1,25 @@
+project_name: vanguard
+release:
+  github:
+    owner: GeorgeA93
+    name: vanguard
+  name_template: '{{.Tag}}'
+brew:
+  github:
+    owner: GeorgeA93
+    name: homebrew-taps
+  commit_author:
+    name: George Allen
+    email: george.allen93@outlook.com
+  install: bin.install "vanguard"
+  description: Vanguard updates from the terminal
+  folder: Formula
+builds:
+  - binary: vanguard
+    main: ./main.go
+    goos:
+      - darwin
+      - linux
+archive:
+  format: tar.gz
+

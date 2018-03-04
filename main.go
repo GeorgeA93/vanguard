@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strconv"
 	"time"
 
@@ -10,43 +11,54 @@ import (
 )
 
 func main() {
+	poll()
+}
+
+func poll() {
 	interval := time.Duration(getEnv("VANGUARD_INTERVAL", 10)) * time.Second
+	driver := agouti.ChromeDriver(
+		agouti.ChromeOptions(
+			"args", []string{
+				"--headless",
+				"--disable-gpu",
+			},
+		),
+	)
+	if err := driver.Start(); err != nil {
+		panic(err)
+	}
+
+	page, err := driver.NewPage()
+	if err != nil {
+		panic(err)
+	}
+
+	login(page)
 	for {
-		driver := agouti.ChromeDriver(
-			agouti.ChromeOptions(
-				"args", []string{
-					"--headless",
-					"--disable-gpu",
-				},
-			),
-		)
-		if err := driver.Start(); err != nil {
-			panic(err)
-		}
-
-		page, err := driver.NewPage()
-		if err != nil {
-			panic(err)
-		}
-
-		login(page)
-
+		fmt.Println("Vanguard.....")
 		percentChanged, err := getPercentageChange(page)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(percentChanged)
 
 		totalValue, err := getTotalValue(page)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(totalValue)
 
-		driver.Stop()
+		fmt.Printf("Current value: %s, Percent change: %s", totalValue, percentChanged)
 
+		page.Refresh()
 		time.Sleep(interval)
+		clearScreen()
 	}
+	driver.Stop()
+}
+
+func clearScreen() {
+	cmd := exec.Command("clear")
+	cmd.Stdout = os.Stdout
+	cmd.Run()
 }
 
 func login(page *agouti.Page) {

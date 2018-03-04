@@ -32,7 +32,3 @@
 [[constraint]]
   name = "github.com/sclevine/agouti"
   revision = "v2-latest"
-
-[[constraint]]
-  name = "github.com/gizak/termui"
-  version = "2.2.0"
